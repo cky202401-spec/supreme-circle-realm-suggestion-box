@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Supreme Circle Realm Suggestion Box</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="container">
+    <h1>Supreme Circle Realm Suggestion Box</h1>
+
+    <form id="suggestionForm" class="card">
+      <label>
+        Name (optional)
+        <input type="text" id="name" placeholder="Your name or leave anonymous">
+      </label>
+
+      <label>
+        Email (optional)
+        <input type="email" id="email" placeholder="Optional contact info">
+      </label>
+
+      <label>
+        Suggestion
+        <textarea id="message" required rows="5" placeholder="Write your suggestion..."></textarea>
+      </label>
+
+      <div class="actions">
+        <button id="submitBtn" type="submit">Submit suggestion</button>
+        <span id="status" class="status"></span>
+      </div>
+    </form>
+
+    <section class="card" id="suggestionsSection">
+      <h2>Recent suggestions</h2>
+      <ul id="suggestionsList">Loading…</ul>
+    </section>
+
+    <p style="text-align:center;font-size:13px;color:#6b7280">Admin? <a href="/admin.html">Open admin panel</a></p>
+  </main>
+
+  <script src="suggestion.js"></script>
+</body>
+</html>

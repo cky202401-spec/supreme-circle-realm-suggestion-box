@@ -1,1 +1,77 @@
-<!doctype html>\n<html lang=\
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Admin — Supreme Circle Realm Suggestion Box</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="container">
+    <h1>Supreme Circle Realm Suggestion Box — Admin</h1>
+
+    <form id="adminForm" class="card">
+      <label>
+        Admin password
+        <input type="password" id="adminPassword" placeholder="Enter admin password">
+      </label>
+      <div class="actions">
+        <button id="adminBtn" type="submit">Unlock</button>
+        <span id="status" class="status"></span>
+      </div>
+    </form>
+
+    <section class="card" id="adminPanel" style="display:none">
+      <h2>Pending suggestions</h2>
+      <ul id="adminList">Loading…</ul>
+    </section>
+
+    <p style="text-align:center;font-size:13px;color:#6b7280"><a href="/">Back to suggestion box</a></p>
+  </main>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', ()=>{
+    const form = document.getElementById('adminForm');
+    const pwdInput = document.getElementById('adminPassword');
+    const status = document.getElementById('status');
+    const panel = document.getElementById('adminPanel');
+    const list = document.getElementById('adminList');
+    const btn = document.getElementById('adminBtn');
+
+    form.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      status.textContent = '';
+      btn.disabled = true;
+      list.innerHTML = 'Loading…';
+      try{
+        const res = await fetch('/.netlify/functions/admin-list', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({password: pwdInput.value.trim()})
+        });
+        const body = await res.json().catch(()=>({error:'invalid'}));
+        if(!res.ok){
+          status.textContent = 'Access denied';
+          list.innerHTML = '';
+        } else {
+          panel.style.display = 'block';
+          status.textContent = '';
+          const issues = body.issues || [];
+          if(issues.length===0) list.innerHTML = '<li>No suggestions found</li>';
+          else list.innerHTML = issues.map(i=>{
+            const title = escapeHtml(i.title||'');
+            const created = new Date(i.created_at).toLocaleString();
+            const bodyText = escapeHtml(i.body||'');
+            return `<li><div class="suggestion-meta">${title} • ${created}</div><div class="suggestion-body">${bodyText}</div></li>`;
+          }).join('');
+        }
+      }catch(err){
+        status.textContent = 'Network error';
+      }finally{btn.disabled = false}
+    });
+
+    function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  });
+  </script>
+</body>
+</html>
