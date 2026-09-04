@@ -3,75 +3,33 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Admin — Supreme Circle Realm Suggestion Box</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Admin Panel</title>
+  <style>
+    body { font-family: system-ui, -apple-system, Arial; padding: 20px; max-width: 720px; margin: auto; background:#f7fafc }
+    .card { border: 1px solid #e5e7eb; padding: 16px; border-radius: 8px; background:#fff; margin-bottom:12px }
+    input, button, select, textarea { font-size: 14px; padding: 8px; margin-top:6px; width:100%; box-sizing:border-box; }
+    button { cursor: pointer }
+    .hidden{display:none}
+  </style>
 </head>
 <body>
-  <main class="container">
-    <h1>Supreme Circle Realm Suggestion Box — Admin</h1>
+  <h1>Admin Panel</h1>
 
-    <form id="adminForm" class="card">
-      <label>
-        Admin password
-        <input type="password" id="adminPassword" placeholder="Enter admin password">
-      </label>
-      <div class="actions">
-        <button id="adminBtn" type="submit">Unlock</button>
-        <span id="status" class="status"></span>
-      </div>
-    </form>
+  <div id="loginCard" class="card">
+    <h2>Sign in</h2>
+    <p>Enter admin password (will be checked server-side).</p>
+    <input id="adminPassword" type="password" placeholder="Admin password">
+    <button id="loginBtn">Sign in</button>
+    <p id="loginStatus" style="color:crimson"></p>
+  </div>
 
-    <section class="card" id="adminPanel" style="display:none">
-      <h2>Pending suggestions</h2>
-      <ul id="adminList">Loading…</ul>
-    </section>
+  <div id="adminArea" class="card hidden">
+    <h2>Admin actions</h2>
+    <button id="logoutBtn">Sign out</button>
+    <h3>Open issues labeled suggestion/complaint</h3>
+    <ul id="issuesList">Loading…</ul>
+  </div>
 
-    <p style="text-align:center;font-size:13px;color:#6b7280"><a href="/">Back to suggestion box</a></p>
-  </main>
-
-  <script>
-  document.addEventListener('DOMContentLoaded', ()=>{
-    const form = document.getElementById('adminForm');
-    const pwdInput = document.getElementById('adminPassword');
-    const status = document.getElementById('status');
-    const panel = document.getElementById('adminPanel');
-    const list = document.getElementById('adminList');
-    const btn = document.getElementById('adminBtn');
-
-    form.addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      status.textContent = '';
-      btn.disabled = true;
-      list.innerHTML = 'Loading…';
-      try{
-        const res = await fetch('/.netlify/functions/admin-list', {
-          method: 'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({password: pwdInput.value.trim()})
-        });
-        const body = await res.json().catch(()=>({error:'invalid'}));
-        if(!res.ok){
-          status.textContent = 'Access denied';
-          list.innerHTML = '';
-        } else {
-          panel.style.display = 'block';
-          status.textContent = '';
-          const issues = body.issues || [];
-          if(issues.length===0) list.innerHTML = '<li>No suggestions found</li>';
-          else list.innerHTML = issues.map(i=>{
-            const title = escapeHtml(i.title||'');
-            const created = new Date(i.created_at).toLocaleString();
-            const bodyText = escapeHtml(i.body||'');
-            return `<li><div class="suggestion-meta">${title} • ${created}</div><div class="suggestion-body">${bodyText}</div></li>`;
-          }).join('');
-        }
-      }catch(err){
-        status.textContent = 'Network error';
-      }finally{btn.disabled = false}
-    });
-
-    function escapeHtml(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-  });
-  </script>
+  <script src="admin.js"></script>
 </body>
 </html>

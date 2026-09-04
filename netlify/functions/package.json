@@ -1,0 +1,7 @@
+{
+  "name": "functions",
+  "dependencies": {
+    "jsonwebtoken": "^9.0.0",
+    "node-fetch": "^2.6.7"
+  }
+}
